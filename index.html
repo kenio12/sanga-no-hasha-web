@@ -109,9 +109,27 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
+		<script>
+// 止まった音声を、画面を触った時に起こし直す
+(function () {
+	const AC = window.AudioContext || window.webkitAudioContext;
+	const ctxs = [];
+	if (AC) {
+		const W = function (...a) { const c = new AC(...a); ctxs.push(c); return c; };
+		W.prototype = AC.prototype;
+		window.AudioContext = W;
+		if (window.webkitAudioContext) window.webkitAudioContext = W;
+	}
+	const kick = () => {
+		ctxs.forEach((c) => { if (c.state !== 'running' && c.state !== 'closed') c.resume().catch(() => {}); });
+	};
+	['touchend', 'pointerup', 'click', 'keydown'].forEach((t) => window.addEventListener(t, kick, true));
+	document.addEventListener('visibilitychange', () => { if (!document.hidden) kick(); });
+}());
+		</script>
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":86875732,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":86947348,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
